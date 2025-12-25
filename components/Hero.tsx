@@ -23,9 +23,10 @@ const Hero: React.FC = () => {
       
       {/* Background Atmosphere: Subtle Glow */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <img 
-          src={HERO_IMAGE_URL} 
-          alt="" 
+        <img
+          src={HERO_IMAGE_URL}
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover blur-[100px] opacity-30 scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
@@ -38,9 +39,9 @@ const Hero: React.FC = () => {
       >
         <div className="relative w-full max-w-6xl h-[65vh] md:h-[75vh] flex items-center justify-center">
           {/* Main Atmosphere Image */}
-          <img 
-            src={HERO_IMAGE_URL} 
-            alt="H Brothers Escondido - Local Ambiance" 
+          <img
+            src={HERO_IMAGE_URL}
+            alt="H Brothers restaurant in Downtown Escondido - warm interior with cozy ambiance serving hearty comfort food"
             onLoad={() => setIsLoaded(true)}
             className={`w-full h-full object-contain shadow-[0_0_100px_rgba(0,0,0,0.9)] border border-white/5 rounded-sm transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
           />
@@ -61,9 +62,9 @@ const Hero: React.FC = () => {
         <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="inline-flex items-center gap-4 mb-6">
             <div className="h-px w-12 bg-karak-secondary/40"></div>
-            <h2 className="text-karak-secondary font-raleway uppercase tracking-[1em] text-[9px] md:text-[11px] font-black drop-shadow-lg">
+            <p className="text-karak-secondary font-raleway uppercase tracking-[1em] text-[9px] md:text-[11px] font-black drop-shadow-lg">
               Est. 2017
-            </h2>
+            </p>
             <div className="h-px w-12 bg-karak-secondary/40"></div>
           </div>
           
@@ -73,16 +74,18 @@ const Hero: React.FC = () => {
           </h1>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6">
-            <a 
-              href="https://www.hbrotherstogo.com/" 
+            <a
+              href="https://www.hbrotherstogo.com/"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Order H Brothers comfort food online for pickup"
               className="bg-karak-accent text-white px-12 py-4 rounded-karak font-black uppercase tracking-[0.25em] text-[10px] hover:bg-white hover:text-karak-primary transition-all shadow-[0_15px_40px_-10px_rgba(192,64,0,0.5)] active:scale-95"
             >
               Order Online
             </a>
-            <button 
+            <button
               onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
+              aria-label="View H Brothers menu"
               className="bg-white/5 border border-white/20 text-white backdrop-blur-xl px-12 py-4 rounded-karak font-black uppercase tracking-[0.25em] text-[10px] hover:bg-white hover:text-black transition-all active:scale-95"
             >
               View Menu

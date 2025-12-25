@@ -10,9 +10,9 @@ const About: React.FC = () => {
         <div className="relative mb-16 lg:mb-20">
           <div className="absolute -top-6 -left-6 w-32 h-32 border-t-4 border-l-4 border-karak-accent opacity-20"></div>
           <div className="relative rounded-2xl shadow-2xl overflow-hidden group">
-            <img 
-              src="https://s3-media0.fl.yelpcdn.com/bphoto/k3GFsndzP0UX3xsnq4nRDg/o.jpg" 
-              alt="H-Brothers Atmosphere and People" 
+            <img
+              src="https://s3-media0.fl.yelpcdn.com/bphoto/k3GFsndzP0UX3xsnq4nRDg/o.jpg"
+              alt="H Brothers restaurant interior in Downtown Escondido - warm family atmosphere"
               className="w-full h-[300px] md:h-[450px] object-cover transition-transform duration-1000 group-hover:scale-105"
             />
             {/* Subtle Gradient Overlay */}

@@ -58,10 +58,10 @@ const Footer: React.FC = () => {
           <div className="flex flex-col items-center md:items-start">
             <h5 className="text-karak-accent font-bold uppercase tracking-widest text-[10px] mb-8">Stay Fed</h5>
             <p className="text-gray-400 text-xs mb-6 text-center md:text-left">Order for pick-up or delivery and bring the comfort home.</p>
-            <a href="https://www.hbrotherstogo.com/" target="_blank" rel="noopener noreferrer" className="block w-full max-w-xs bg-karak-accent text-karak-primary py-4 rounded-karak font-bold uppercase tracking-widest text-[10px] text-center hover:bg-white transition-all shadow-lg mb-3">
+            <a href="https://www.hbrotherstogo.com/" target="_blank" rel="noopener noreferrer" aria-label="Order H Brothers food online for pickup" className="block w-full max-w-xs bg-karak-accent text-karak-primary py-4 rounded-karak font-bold uppercase tracking-widest text-[10px] text-center hover:bg-white transition-all shadow-lg mb-3">
               Order Online
             </a>
-            <a href="https://hbrothers.dine.online/" target="_blank" rel="noopener noreferrer" className="block w-full max-w-xs border border-white/20 text-white py-4 rounded-karak font-bold uppercase tracking-widest text-[10px] text-center hover:bg-white/10 transition-all">
+            <a href="https://hbrothers.dine.online/" target="_blank" rel="noopener noreferrer" aria-label="Get H Brothers food delivered" className="block w-full max-w-xs border border-white/20 text-white py-4 rounded-karak font-bold uppercase tracking-widest text-[10px] text-center hover:bg-white/10 transition-all">
               Get Delivery
             </a>
           </div>
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
           <div className="flex space-x-8 mt-6 md:mt-0">
             <a href="#" className="hover:text-karak-accent transition-colors">Privacy</a>
             <a href="#" className="hover:text-karak-accent transition-colors">Terms</a>
-            <a href="https://maps.app.goo.gl/G7mpujLuGWzYXq9s6" target="_blank" rel="noopener noreferrer" className="hover:text-karak-accent transition-colors">Google Maps</a>
+            <a href="https://maps.app.goo.gl/G7mpujLuGWzYXq9s6" target="_blank" rel="noopener noreferrer" aria-label="Find H Brothers on Google Maps" className="hover:text-karak-accent transition-colors">Google Maps</a>
           </div>
         </div>
       </div>

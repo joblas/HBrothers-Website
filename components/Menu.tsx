@@ -23,9 +23,9 @@ const Menu: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2">
               <div className="h-[400px] overflow-hidden">
-                <img 
-                  src="https://s3-media0.fl.yelpcdn.com/bphoto/WM0m_NzTkfx8c7dw1uZL9Q/o.jpg" 
-                  alt="Brisket Mac & Cheese" 
+                <img
+                  src="https://s3-media0.fl.yelpcdn.com/bphoto/WM0m_NzTkfx8c7dw1uZL9Q/o.jpg"
+                  alt="H Brothers Brisket Mac & Cheese - 12-hour smoked brisket over creamy three-cheese mac"
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                 />
               </div>
@@ -36,9 +36,11 @@ const Menu: React.FC = () => {
                 </p>
                 <div className="flex items-center justify-between gap-4">
                   <span className="text-2xl font-bold text-karak-primary">$16.95</span>
-                  <a 
-                    href="https://www.hbrotherstogo.com/" 
+                  <a
+                    href="https://www.hbrotherstogo.com/"
                     target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Order Brisket Mac & Cheese online"
                     className="bg-karak-primary text-karak-accent px-5 py-3 md:px-10 md:py-4 rounded-karak font-bold uppercase tracking-widest text-[9px] md:text-[10px] hover:shadow-xl transition-all whitespace-nowrap active:scale-95"
                   >
                     Order Special Now
@@ -60,15 +62,17 @@ const Menu: React.FC = () => {
           {MENU_ITEMS.filter(item => item.id !== 'special-1').map((item) => (
             <div key={item.id} className="group flex flex-col h-full bg-white rounded-karak border border-gray-100 shadow-sm overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1">
               <div className="relative h-56 overflow-hidden">
-                <img 
-                  src={item.imageUrl} 
-                  alt={item.name} 
+                <img
+                  src={item.imageUrl}
+                  alt={`${item.name} - ${item.description}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-karak-primary/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <a 
-                    href="https://www.hbrotherstogo.com/" 
+                   <a
+                    href="https://www.hbrotherstogo.com/"
                     target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Order ${item.name} online`}
                     className="bg-karak-accent text-karak-primary px-6 py-2 rounded-karak font-bold uppercase tracking-widest text-[9px] shadow-lg"
                   >
                     Order Now
@@ -87,21 +91,23 @@ const Menu: React.FC = () => {
         </div>
 
         <div className="mt-24 text-center">
-          <a 
-            href="https://www.hbrotherstogo.com/" 
+          <a
+            href="https://www.hbrotherstogo.com/"
             target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View full H Brothers menu and order online"
             className="inline-flex items-center gap-3 border-b-2 border-karak-accent text-karak-primary font-bold uppercase tracking-widest text-xs py-3 hover:text-karak-accent transition-all mb-16"
           >
             View Full Menu & Order Online
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5l7 7m0 0l-7 7m7-7H3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </a>
 
           {/* New Highlight Image */}
           <div className="relative max-w-5xl mx-auto rounded-karak overflow-hidden shadow-2xl border border-white group">
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <img 
-              src="https://s3-media0.fl.yelpcdn.com/bphoto/cmk9sSDNnAa9t0MYZSnY_A/o.jpg" 
-              alt="H Brothers comfort food spread" 
+            <img
+              src="https://s3-media0.fl.yelpcdn.com/bphoto/cmk9sSDNnAa9t0MYZSnY_A/o.jpg"
+              alt="H Brothers comfort food spread featuring hearty American classics in Escondido"
               className="w-full h-[450px] object-cover grayscale-[0.2] contrast-[1.05] transition-transform duration-1000 group-hover:scale-105 group-hover:grayscale-0"
             />
             <div className="absolute bottom-8 left-8 z-20 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
