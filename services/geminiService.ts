@@ -21,7 +21,6 @@ let model: any = null;
 
 if (API_KEY) {
   genAI = new GoogleGenerativeAI(API_KEY);
-  model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 }
 
 const SYSTEM_INSTRUCTION = `
@@ -53,6 +52,13 @@ ${MENU_ITEMS.map(item => `- ${item.name} (${item.price}): ${item.description}`).
 5. Do NOT make up menu items that are not on the list.
 `;
 
+if (genAI) {
+  model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: SYSTEM_INSTRUCTION
+  });
+}
+
 export const getChatResponse = async (history: { role: "user" | "model"; parts: string }[], newMessage: string) => {
   if (!API_KEY || !model) {
     return "I'm sorry, I'm having trouble connecting to the kitchen right now. Please call us at (442) 999-5542.";
@@ -69,13 +75,7 @@ export const getChatResponse = async (history: { role: "user" | "model"; parts: 
           role: "model",
           parts: [{ text: "I am the H Brothers Concierge. How can I help you get fed today?" }],
         },
-        // We inject the system instruction as a "hidden" history context or just rely on the prompt structure
-        // Since the JS SDK for Flash might not support system instructions perfectly in all versions, 
-        // we can prepend it to the chat or use the systemInstruction property if available.
-        // For robustness, we will use the systemInstruction config in model init if possible, 
-        // but here we can just ensure the persona is maintained.
       ],
-      systemInstruction: SYSTEM_INSTRUCTION, // Supported in newer SDKs
     });
 
     // Send the user's message

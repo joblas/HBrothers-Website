@@ -21,37 +21,27 @@ const Hero: React.FC = () => {
   return (
     <section id="hero" className="relative h-screen w-full bg-[#0d0a08] overflow-hidden flex flex-col items-center justify-center">
       
-      {/* Background Atmosphere: Subtle Glow */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      {/* Background Image: Full screen */}
+      <div 
+        className="absolute inset-0 z-0 overflow-hidden transition-transform duration-1000 ease-out"
+        style={{ transform: `scale(${1 + scrollY * 0.0002})` }}
+      >
         <img
           src={HERO_IMAGE_URL}
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover blur-[100px] opacity-30 scale-110"
+          alt="H Brothers restaurant in Downtown Escondido - warm interior with cozy ambiance serving hearty comfort food"
+          onLoad={() => setIsLoaded(true)}
+          className={`w-full h-full object-cover transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
-      </div>
-
-      {/* The Gallery Frame: Ensures "Zoomed Out" context */}
-      <div 
-        className="relative z-10 w-full h-full flex items-center justify-center px-4 md:px-12 lg:px-24 transition-transform duration-1000 ease-out"
-        style={{ transform: `scale(${1 + scrollY * 0.00015})` }}
-      >
-        <div className="relative w-full max-w-6xl h-[65vh] md:h-[75vh] flex items-center justify-center">
-          {/* Main Atmosphere Image */}
-          <img
-            src={HERO_IMAGE_URL}
-            alt="H Brothers restaurant in Downtown Escondido - warm interior with cozy ambiance serving hearty comfort food"
-            onLoad={() => setIsLoaded(true)}
-            className={`w-full h-full object-contain shadow-[0_0_100px_rgba(0,0,0,0.9)] border border-white/5 rounded-sm transition-opacity duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-          />
-          
-          {/* Subtle lighting mask to enhance the internal lamps */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.4)_100%)] pointer-events-none rounded-sm"></div>
-          
-          {/* Lighting Flare Overlay - Aligned with branding lamps */}
-          <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none"></div>
-        </div>
+        
+        {/* Overlays for depth and readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90"></div>
+        
+        {/* Subtle lighting mask to enhance the internal lamps */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
+        
+        {/* Lighting Flare Overlay */}
+        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none"></div>
       </div>
 
       {/* Hero Interaction Layer - Positioned to reveal the branding text */}
