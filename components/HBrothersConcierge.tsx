@@ -45,11 +45,34 @@ const MenuItemCard: React.FC<{
   </div>
 );
 
+// Helper to convert URLs to clickable links
+const formatMessageWithLinks = (text: string, isUser: boolean): React.ReactNode => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`underline font-medium ${isUser ? 'text-white/90 hover:text-white' : 'text-karak-primary hover:text-karak-accent'}`}
+        >
+          {part.replace('https://www.', '').replace('https://', '').replace(/\/$/, '')}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 // Message Bubble
 const MessageBubble: React.FC<{
   message: ChatMessage;
   isLast: boolean;
-}> = ({ message, isLast }) => {
+}> = ({ message }) => {
   const isUser = message.role === 'user';
 
   return (
@@ -61,11 +84,11 @@ const MessageBubble: React.FC<{
             : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm'
           }`}
       >
-        {message.text}
+        {formatMessageWithLinks(message.text, isUser)}
       </div>
 
       {/* Timestamp */}
-      {message.timestamp && isLast && (
+      {message.timestamp && (
         <span className="text-[10px] text-gray-400 mt-1 px-1">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
