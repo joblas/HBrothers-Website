@@ -2,29 +2,27 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   getChatResponse,
   updateContext,
-  QUICK_ACTIONS,
-  RESTAURANT_INFO,
-  CURRENT_PROMOTION
+  RESTAURANT_INFO
 } from '../services/geminiService';
 import {
   startSession,
   trackMessage,
   trackMenuItemView,
-  trackQuickAction,
   trackOrderClick,
-  trackFeedback,
   endSession
 } from '../services/analyticsService';
 import { ChatMessage, ConversationContext, MenuItem } from '../types';
 
-// Menu Item Card Component
+// --- Components ---
+
+// Simplified Menu Item Card
 const MenuItemCard: React.FC<{
   item: MenuItem;
   onOrder: () => void;
 }> = ({ item, onOrder }) => (
-  <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 w-[200px] flex-shrink-0 hover:shadow-lg transition-shadow">
-    <div className="h-24 bg-gradient-to-br from-karak-primary/10 to-karak-accent/20 flex items-center justify-center">
-      <span className="text-4xl">
+  <div className="bg-white rounded-xl shadow-sm border border-gray-100 min-w-[200px] w-[200px] flex-shrink-0 overflow-hidden hover:shadow-md transition-all duration-300 group">
+    <div className="h-20 bg-gradient-to-br from-karak-primary/5 to-karak-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+      <span className="text-3xl filter drop-shadow-sm">
         {item.category === 'specials' ? '⭐' :
           item.category === 'sandwiches' ? '🥪' :
             item.category === 'sides' ? '🍟' :
@@ -34,12 +32,12 @@ const MenuItemCard: React.FC<{
     <div className="p-3">
       <div className="flex justify-between items-start mb-1">
         <h4 className="font-bold text-xs text-gray-800 leading-tight">{item.name}</h4>
-        <span className="text-karak-accent font-bold text-xs whitespace-nowrap ml-2">{item.price}</span>
+        <span className="text-karak-primary font-bold text-xs whitespace-nowrap ml-2">{item.price}</span>
       </div>
-      <p className="text-[10px] text-gray-500 line-clamp-2 mb-2">{item.description}</p>
+      <p className="text-[10px] text-gray-500 line-clamp-2 mb-2 leading-relaxed">{item.description}</p>
       <button
         onClick={onOrder}
-        className="w-full bg-karak-primary text-white text-[10px] font-medium py-1.5 rounded-lg hover:bg-karak-accent hover:text-karak-primary transition-all"
+        className="w-full bg-white text-karak-primary border border-karak-primary text-[10px] font-bold py-1.5 rounded-lg hover:bg-karak-primary hover:text-white transition-all uppercase tracking-wide"
       >
         Order Now
       </button>
@@ -47,111 +45,45 @@ const MenuItemCard: React.FC<{
   </div>
 );
 
-// Feedback Widget Component
-const FeedbackWidget: React.FC<{
-  onSubmit: (rating: number, comment?: string) => void;
-  onClose: () => void;
-}> = ({ onSubmit, onClose }) => {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = () => {
-    if (rating > 0) {
-      onSubmit(rating, comment || undefined);
-      setSubmitted(true);
-      setTimeout(onClose, 1500);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <div className="p-4 bg-green-50 border-t border-green-100 text-center">
-        <span className="text-green-600 font-medium text-sm">Thanks for your feedback! 🙏</span>
-      </div>
-    );
-  }
+// Message Bubble
+const MessageBubble: React.FC<{
+  message: ChatMessage;
+  isLast: boolean;
+}> = ({ message, isLast }) => {
+  const isUser = message.role === 'user';
 
   return (
-    <div className="p-3 bg-gray-50 border-t border-gray-200">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-xs font-medium text-gray-600">How was your experience?</span>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </button>
+    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+      <div
+        className={`max-w-[85%] px-4 py-3 text-sm leading-relaxed shadow-sm relative group
+          ${isUser
+            ? 'bg-karak-primary text-white rounded-2xl rounded-tr-sm'
+            : 'bg-white text-gray-800 border border-gray-100 rounded-2xl rounded-tl-sm'
+          }`}
+      >
+        {message.text}
       </div>
-      <div className="flex gap-1 mb-2 justify-center">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            onClick={() => setRating(star)}
-            className={`text-2xl transition-transform hover:scale-125 ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-          >
-            ★
-          </button>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Any comments? (optional)"
-          className="flex-1 text-xs px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-karak-accent bg-white"
-        />
-        <button
-          onClick={handleSubmit}
-          disabled={rating === 0}
-          className="px-4 py-2 bg-karak-primary text-white text-xs rounded-lg hover:bg-karak-accent hover:text-karak-primary transition-all disabled:opacity-50"
-        >
-          Send
-        </button>
-      </div>
+
+      {/* Timestamp */}
+      {message.timestamp && isLast && (
+        <span className="text-[10px] text-gray-400 mt-1 px-1">
+          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      )}
     </div>
   );
 };
 
-// Promotion Banner Component
-const PromotionBanner: React.FC<{
-  onDismiss: () => void;
-  onLearnMore: () => void;
-}> = ({ onDismiss, onLearnMore }) => (
-  <div className="mx-3 mt-3 p-3 bg-gradient-to-r from-karak-accent/20 to-karak-accent/10 rounded-xl border border-karak-accent/30 relative">
-    <button
-      onClick={onDismiss}
-      className="absolute top-2 right-2 text-karak-primary/40 hover:text-karak-primary"
-    >
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    </button>
-    <div className="flex items-start gap-2">
-      <span className="text-xl">⭐</span>
-      <div className="flex-1 pr-4">
-        <h4 className="font-bold text-sm text-karak-primary">{CURRENT_PROMOTION.title}</h4>
-        <p className="text-xs text-gray-600 mt-0.5">{CURRENT_PROMOTION.description}</p>
-        <button
-          onClick={onLearnMore}
-          className="mt-2 text-xs font-semibold text-karak-primary hover:text-karak-accent transition-colors"
-        >
-          Tell me more →
-        </button>
-      </div>
-    </div>
-  </div>
-);
+// --- Main Component ---
 
-// Main Component
 const HBrothersConcierge: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'model',
-      text: "Hey there! 👋 I'm the H Brothers Concierge. Craving a burger or need directions? I'm here to help!",
+      text: "Hi! 👋 Welcome to H Brothers. How can I help you today?",
       timestamp: new Date(),
-      suggestedReplies: ["What's on the menu?", "What are your hours?", "Where are you located?"]
+      suggestedReplies: ["See the menu", "Check hours", "Order food"]
     }
   ]);
   const [context, setContext] = useState<ConversationContext>({
@@ -164,10 +96,7 @@ const HBrothersConcierge: React.FC = () => {
   });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
-  const [showPromotion, setShowPromotion] = useState(CURRENT_PROMOTION.isActive);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [notificationSeen, setNotificationSeen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -177,29 +106,18 @@ const HBrothersConcierge: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isLoading]);
 
   // Start analytics session when chat opens
   useEffect(() => {
-    if (isOpen) {
-      setNotificationSeen(true);
-      if (!hasInteracted) {
-        startSession();
-      }
+    if (isOpen && !hasInteracted) {
+      startSession();
     }
   }, [isOpen, hasInteracted]);
 
-  // Handle close with optional feedback
   const handleClose = () => {
-    if (hasInteracted && messages.length > 2 && !showFeedback) {
-      setShowFeedback(true);
-    } else {
-      if (hasInteracted) {
-        endSession();
-      }
-      setIsOpen(false);
-      setShowFeedback(false);
-    }
+    if (hasInteracted) endSession();
+    setIsOpen(false);
   };
 
   const handleSendMessage = async (messageText: string) => {
@@ -217,7 +135,6 @@ const HBrothersConcierge: React.FC = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setIsLoading(true);
 
-    // Track analytics
     trackMessage(userMessage, true);
 
     try {
@@ -228,7 +145,6 @@ const HBrothersConcierge: React.FC = () => {
 
       const response = await getChatResponse(history, userMessage, context);
 
-      // Track menu item views
       response.menuItems.forEach(item => trackMenuItemView(item.id));
 
       const newModelMessage: ChatMessage = {
@@ -244,9 +160,8 @@ const HBrothersConcierge: React.FC = () => {
     } catch (error) {
       setMessages(prev => [...prev, {
         role: 'model',
-        text: "I'm having a bit of trouble right now. Please try again!",
-        timestamp: new Date(),
-        suggestedReplies: ["Try again", "Call restaurant"]
+        text: "I'm having a bit of trouble connecting. You can always call us directly!",
+        timestamp: new Date()
       }]);
     } finally {
       setIsLoading(false);
@@ -258,52 +173,38 @@ const HBrothersConcierge: React.FC = () => {
     handleSendMessage(input);
   };
 
-  const handleQuickAction = (action: typeof QUICK_ACTIONS[0]) => {
-    trackQuickAction(action.id);
-    if (action.id === 'order') {
-      trackOrderClick();
-      window.open(RESTAURANT_INFO.orderUrl, '_blank');
-    } else {
-      handleSendMessage(action.message);
-    }
-  };
-
   const handleOrderClick = () => {
     trackOrderClick();
     window.open(RESTAURANT_INFO.orderUrl, '_blank');
   };
 
-  const handleFeedback = (rating: number, comment?: string) => {
-    trackFeedback(rating, comment);
-  };
-
-  const handlePromotionLearnMore = () => {
-    setShowPromotion(false);
-    handleSendMessage("Tell me about the brisket special");
-  };
-
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 w-[calc(100vw-32px)] sm:w-[360px] h-[60vh] sm:h-[550px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-10 origin-bottom-right">
+        <div className="mb-4 w-[calc(100vw-40px)] sm:w-[380px] h-[600px] max-h-[80vh] bg-[#f9fafb] rounded-[24px] shadow-2xl border border-gray-100 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 origin-bottom-right">
+
           {/* Header */}
-          <div className="bg-karak-primary p-4 flex justify-between items-center shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="text-2xl">🤖</span>
-              </div>
-              <div>
-                <h3 className="text-white font-bold text-sm">H Brothers Concierge</h3>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></div>
-                  <p className="text-karak-accent text-[10px] uppercase tracking-wider">Online • Gemini Powered</p>
+          <div className="bg-karak-primary px-6 py-4 flex justify-between items-center shrink-0 shadow-sm relative overflow-hidden">
+            {/* Decorative background element */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                  <span className="text-xl">🤖</span>
                 </div>
+                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-karak-primary rounded-full"></div>
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-white font-bold text-base tracking-wide">Concierge</h3>
+                <span className="text-karak-accent text-[10px] font-medium uppercase tracking-wider">H Brothers</span>
               </div>
             </div>
+
             <button
               onClick={handleClose}
-              className="text-white/60 hover:text-white transition-colors p-1"
+              className="text-white/70 hover:text-white hover:bg-white/10 p-2 rounded-full transition-all relative z-10"
               aria-label="Close chat"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,50 +213,15 @@ const HBrothersConcierge: React.FC = () => {
             </button>
           </div>
 
-          {/* Promotion Banner */}
-          {showPromotion && (
-            <PromotionBanner
-              onDismiss={() => setShowPromotion(false)}
-              onLearnMore={handlePromotionLearnMore}
-            />
-          )}
-
-          {/* Quick Actions Bar */}
-          <div className="px-3 py-2 bg-white border-b border-gray-100 overflow-x-auto shrink-0">
-            <div className="flex gap-2">
-              {QUICK_ACTIONS.map(action => (
-                <button
-                  key={action.id}
-                  onClick={() => handleQuickAction(action)}
-                  disabled={isLoading}
-                  className="flex-none flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-karak-accent/10 hover:border-karak-accent rounded-full border border-gray-200 transition-all text-[11px] font-medium text-gray-600 disabled:opacity-50"
-                >
-                  <span>{action.icon}</span>
-                  <span>{action.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto bg-gray-50 space-y-4">
+          <div className="flex-1 p-4 sm:p-5 overflow-y-auto space-y-2 scroll-smooth">
             {messages.map((msg, idx) => (
-              <div key={idx} className="space-y-2">
-                {/* Message Bubble */}
-                <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
-                      ? 'bg-karak-primary text-white rounded-br-none shadow-md'
-                      : 'bg-white text-gray-700 shadow-sm border border-gray-100 rounded-bl-none'
-                      }`}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
+              <div key={idx}>
+                <MessageBubble message={msg} isLast={idx === messages.length - 1} />
 
-                {/* Menu Item Cards */}
+                {/* Menu Items Carousel */}
                 {msg.menuItems && msg.menuItems.length > 0 && (
-                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                  <div className="flex gap-3 overflow-x-auto pb-4 pt-1 px-1 -mx-1 mb-2 scrollbar-hide">
                     {msg.menuItems.map((item) => (
                       <MenuItemCard
                         key={item.id}
@@ -366,25 +232,18 @@ const HBrothersConcierge: React.FC = () => {
                   </div>
                 )}
 
-                {/* Suggested Replies (only for the last bot message) */}
+                {/* Suggested Replies (only for last message) */}
                 {!isLoading && msg.role === 'model' && idx === messages.length - 1 && msg.suggestedReplies && (
-                  <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="flex flex-wrap gap-2 mt-1 mb-2">
                     {msg.suggestedReplies.map((reply, rIdx) => (
                       <button
                         key={rIdx}
                         onClick={() => handleSendMessage(reply)}
-                        className="text-[11px] bg-white border border-karak-accent/30 text-karak-primary px-3 py-1.5 rounded-full hover:bg-karak-accent/10 hover:border-karak-accent transition-all duration-200"
+                        className="text-xs bg-white text-karak-primary border border-karak-primary/20 hover:border-karak-primary hover:bg-karak-primary/5 px-4 py-2 rounded-full transition-all duration-200 font-medium shadow-sm"
                       >
                         {reply}
                       </button>
                     ))}
-                  </div>
-                )}
-
-                {/* Timestamp */}
-                {msg.timestamp && (
-                  <div className={`text-[9px] text-gray-400 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 )}
               </div>
@@ -392,11 +251,11 @@ const HBrothersConcierge: React.FC = () => {
 
             {/* Loading Indicator */}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100 flex gap-1.5">
-                  <div className="w-2 h-2 bg-karak-accent rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-karak-accent rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-karak-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="flex justify-start mb-4">
+                <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 flex gap-1.5 items-center">
+                  <div className="w-1.5 h-1.5 bg-karak-primary/60 rounded-full animate-bounce"></div>
+                  <div className="w-1.5 h-1.5 bg-karak-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-1.5 h-1.5 bg-karak-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             )}
@@ -404,71 +263,50 @@ const HBrothersConcierge: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Feedback Widget */}
-          {showFeedback && (
-            <FeedbackWidget
-              onSubmit={handleFeedback}
-              onClose={() => {
-                setShowFeedback(false);
-                endSession();
-                setIsOpen(false);
-              }}
-            />
-          )}
-
           {/* Input Area */}
-          {!showFeedback && (
-            <form onSubmit={handleSubmit} className="p-3 bg-white border-t border-gray-100 shrink-0">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask about our food, hours, or specials..."
-                  className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-karak-accent focus:border-transparent focus:bg-white transition-all"
-                  aria-label="Message input"
-                  disabled={isLoading}
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="w-10 h-10 rounded-full bg-karak-accent text-karak-primary flex items-center justify-center hover:bg-karak-primary hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-                  aria-label="Send message"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
+          <div className="p-4 bg-white border-t border-gray-100 shrink-0">
+            <form onSubmit={handleSubmit} className="flex gap-2 items-center">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 bg-gray-50 text-gray-800 placeholder-gray-400 border-0 rounded-full px-5 py-3 text-sm focus:ring-2 focus:ring-karak-primary/20 focus:bg-white transition-all outline-none"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="w-11 h-11 rounded-full bg-karak-primary text-white flex items-center justify-center hover:bg-karak-primary/90 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 shadow-md"
+              >
+                <svg className="w-5 h-5 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
             </form>
-          )}
+            <div className="text-center mt-2 hidden sm:block">
+              <span className="text-[9px] text-gray-300 font-medium tracking-wide">POWERED BY GEMINI</span>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Toggle Button */}
+      {/* Launcher Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative flex items-center justify-center w-16 h-16 bg-karak-primary text-white rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:scale-110 hover:bg-karak-accent hover:text-karak-primary transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-karak-accent/30"
-        aria-label={isOpen ? "Close concierge chat" : "Open concierge chat"}
+        className={`group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 focus:outline-none z-50
+          ${isOpen ? 'bg-white text-gray-800 rotate-90' : 'bg-karak-primary text-white hover:scale-110'}`}
       >
-        {/* Notification Badge */}
-        {!isOpen && CURRENT_PROMOTION.isActive && !notificationSeen && (
-          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center animate-pulse">
-            <span className="text-[10px] text-white font-bold">1</span>
-          </div>
-        )}
-
-        {/* Pulse Animation when closed */}
-        {!isOpen && (
-          <div className="absolute inset-0 rounded-full bg-karak-accent/40 animate-ping"></div>
-        )}
-
         {isOpen ? (
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M19 9l-7 7-7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
-          <span className="text-3xl relative z-10">💬</span>
+          <div className="relative">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
         )}
       </button>
     </div>

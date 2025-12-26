@@ -12,18 +12,6 @@ console.log("[Gemini] API Key prefix:", API_KEY ? API_KEY.substring(0, 8) + "...
 // Restaurant information
 export const RESTAURANT_INFO = siteContent.restaurant;
 
-// Quick actions for the chat
-export const QUICK_ACTIONS = [
-  { id: 'menu', label: 'See Menu', icon: '🍔', message: 'Show me the menu' },
-  { id: 'hours', label: 'Hours', icon: '🕐', message: 'What are your hours?' },
-  { id: 'location', label: 'Location', icon: '📍', message: 'Where are you located?' },
-  { id: 'order', label: 'Order Now', icon: '🛒', message: 'I want to order food' },
-  { id: 'specials', label: 'Specials', icon: '⭐', message: "What are today's specials?" }
-];
-
-// Current promotion
-export const CURRENT_PROMOTION = siteContent.promotion;
-
 // System prompt
 const SYSTEM_PROMPT = `You are the H Brothers Concierge, a friendly AI assistant for H Brothers restaurant in Escondido, CA.
 
@@ -31,6 +19,9 @@ Location: 212 E. Grand Ave, Escondido, CA 92025
 Hours: Tuesday-Saturday 11AM-9PM, Closed Sunday & Monday
 Phone: (442) 999-5542
 Order online: https://www.hbrotherstogo.com/
+
+IMPORTANT: When users ask to "see the menu" or "show me the menu", respond with:
+"You can view our full menu and order online at https://www.hbrotherstogo.com/ 🍔"
 
 Menu items:
 ${MENU_ITEMS.map(item => `- ${item.name} (${item.price}): ${item.description}`).join('\n')}
@@ -114,41 +105,13 @@ export const getChatResponse = async (
 
   try {
     const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const fullPrompt = `${SYSTEM_PROMPT}\n\nCustomer says: "${userMessage}"\n\nRespond as the H Brothers Concierge:`;
 
-    // Try different model names (gemini-2.5-flash is currently available)
-    const modelNames = [
-      "gemini-2.5-flash",
-      "gemini-2.0-flash",
-      "gemini-1.5-flash"
-    ];
-
-    let responseText = "";
-    let lastError = null;
-
-    for (const modelName of modelNames) {
-      try {
-        console.log(`[Gemini] Trying model: ${modelName}`);
-
-        const model = genAI.getGenerativeModel({ model: modelName });
-
-        // Combine system prompt with user message
-        const fullPrompt = `${SYSTEM_PROMPT}\n\nCustomer says: "${userMessage}"\n\nRespond as the H Brothers Concierge:`;
-
-        const result = await model.generateContent(fullPrompt);
-        responseText = result.response.text();
-
-        console.log(`[Gemini] Success with model: ${modelName}`);
-        break;
-
-      } catch (err: any) {
-        console.warn(`[Gemini] Model ${modelName} failed:`, err.message);
-        lastError = err;
-      }
-    }
-
-    if (!responseText) {
-      throw lastError || new Error("All models failed");
-    }
+    console.log("[Gemini] Sending request...");
+    const result = await model.generateContent(fullPrompt);
+    const responseText = result.response.text();
+    console.log("[Gemini] Got response");
 
     const menuItems = detectMenuItems(responseText);
     const suggestedReplies = generateSuggestedReplies(responseText, ctx);

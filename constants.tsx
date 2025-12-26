@@ -12,7 +12,7 @@ export const COLORS = {
   link: '#DCB48D'
 };
 
-export const MENU_ITEMS: MenuItem[] = siteContent.menu.map(item => ({
-  ...item,
-  imageUrl: `${BASE_URL}images/${item.imageName}`
-}));
+export const MENU_ITEMS: MenuItem[] = siteContent.menu.map(item => {
+  const { imageName, ...rest } = item;
+  return { ...rest, imageUrl: `${BASE_URL}images/${imageName}` } as MenuItem;
+});
