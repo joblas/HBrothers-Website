@@ -9,7 +9,12 @@
       "Bash(git push:*)",
       "WebSearch",
       "Bash(npm run build:*)",
-      "Bash(npx gh-pages:*)"
+      "Bash(npx gh-pages:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:hbrothers.net)",
+      "WebFetch(domain:www.times-advocate.com)"
     ],
     "deny": [],
     "ask": []

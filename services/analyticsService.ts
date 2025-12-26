@@ -1,7 +1,24 @@
 import { ChatAnalytics } from '../types';
 
+declare global {
+  interface Window {
+    gtag: (
+      command: 'event' | 'config' | 'js' | 'set',
+      targetId: string,
+      config?: Record<string, any>
+    ) => void;
+  }
+}
+
 const STORAGE_KEY = 'hbrothers_chat_analytics';
 const SESSIONS_KEY = 'hbrothers_chat_sessions';
+
+// Helper to send events to GA4 if available
+const sendGAEvent = (eventName: string, params?: Record<string, any>) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, params);
+  }
+};
 
 // Generate a unique session ID
 const generateSessionId = (): string => {
@@ -21,6 +38,10 @@ export const startSession = (): ChatAnalytics => {
     quickActionsUsed: [],
     orderLinkClicked: false
   };
+  
+  // Track session start
+  sendGAEvent('chat_session_start');
+  
   return currentSession;
 };
 
@@ -31,6 +52,13 @@ export const trackMessage = (message: string, isUser: boolean) => {
   if (currentSession && isUser) {
     currentSession.messageCount++;
     currentSession.questionsAsked.push(message);
+    
+    // Send to GA4
+    sendGAEvent('chat_interaction', {
+      event_category: 'Chat',
+      event_label: 'User Question',
+      message_length: message.length
+    });
   }
 };
 
@@ -38,6 +66,12 @@ export const trackMenuItemView = (itemId: string) => {
   if (!currentSession) startSession();
   if (currentSession && !currentSession.menuItemsViewed.includes(itemId)) {
     currentSession.menuItemsViewed.push(itemId);
+    
+    // Send standard e-commerce event
+    sendGAEvent('view_item', {
+      currency: 'USD',
+      items: [{ item_name: itemId }]
+    });
   }
 };
 
@@ -45,6 +79,11 @@ export const trackQuickAction = (actionId: string) => {
   if (!currentSession) startSession();
   if (currentSession) {
     currentSession.quickActionsUsed.push(actionId);
+    
+    sendGAEvent('select_content', {
+      content_type: 'quick_action',
+      item_id: actionId
+    });
   }
 };
 
@@ -52,6 +91,11 @@ export const trackOrderClick = () => {
   if (!currentSession) startSession();
   if (currentSession) {
     currentSession.orderLinkClicked = true;
+    
+    // High value event
+    sendGAEvent('begin_checkout', {
+      method: 'external_link'
+    });
   }
 };
 
@@ -59,6 +103,11 @@ export const trackFeedback = (rating: number, comment?: string) => {
   if (!currentSession) return;
   currentSession.feedbackRating = rating;
   currentSession.feedbackComment = comment;
+  
+  sendGAEvent('post_score', {
+    score: rating,
+    level: 1 // Using 'level' as a proxy for session depth or similar if needed
+  });
 };
 
 export const endSession = () => {
