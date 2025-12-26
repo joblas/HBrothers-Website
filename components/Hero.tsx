@@ -13,8 +13,8 @@ const Hero: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Updated to the high-resolution brand image provided by the user
-  const HERO_IMAGE_URL = `${import.meta.env.BASE_URL}images/hero-bg.jpg`;
+  // Hero background from Yelp photos
+  const HERO_IMAGE_URL = "https://s3-media0.fl.yelpcdn.com/bphoto/RoDrT6UTCt1QeWMkcfH5bw/o.jpg";
 
   const contentOpacity = Math.max(0, 1 - scrollY / 600);
 
