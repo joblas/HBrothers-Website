@@ -159,7 +159,9 @@ export const getChatResponse = async (
     return { text: responseText, menuItems, suggestedReplies };
 
   } catch (error: any) {
-    console.error("[Gemini] All attempts failed:", error);
+    console.error("[Gemini] Error:", error?.message || error);
+    console.error("[Gemini] Status:", error?.status);
+    console.error("[Gemini] Full error:", JSON.stringify(error, null, 2));
     return {
       text: `Sorry, I'm having trouble right now. Please call us at (442) 999-5542!`,
       menuItems: [],
