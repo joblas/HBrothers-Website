@@ -20,20 +20,21 @@ const MenuItemCard: React.FC<{
   item: MenuItem;
   onOrder: () => void;
 }> = ({ item, onOrder }) => {
-  // Map items to curated food images
+  // Map items to local images
   const getItemImage = (name: string): string => {
+    const basePath = `${import.meta.env.BASE_URL}images/`;
     const images: Record<string, string> = {
-      'Brisket Mac & Cheese': 'https://s3-media0.fl.yelpcdn.com/bphoto/aJOLmBCP1bBlCvPjqLG6sw/o.jpg',
-      'Classic Burger': 'https://s3-media0.fl.yelpcdn.com/bphoto/F5futODKSy8MzMjTZaFadA/o.jpg',
-      'Original Poutine': 'https://s3-media0.fl.yelpcdn.com/bphoto/zRxhaZPNqRylbu8AiVTdvQ/o.jpg',
-      'Chicken Sandwich': 'https://s3-media0.fl.yelpcdn.com/bphoto/JORb6rTEjwk4VwJq0L68tA/o.jpg',
-      'Parmesan Chicken': 'https://s3-media0.fl.yelpcdn.com/bphoto/AZB7dYVf_fHqCqk6MaVYaQ/o.jpg',
-      'Loaded Fries': 'https://s3-media0.fl.yelpcdn.com/bphoto/gD9I0wj4j0n0k2VYFfK1rw/o.jpg',
-      'Shrimp Po-Boy': 'https://s3-media0.fl.yelpcdn.com/bphoto/OQvJqE2qi1SdYZNj4Qhq4g/o.jpg',
-      'Mac & Cheese': 'https://s3-media0.fl.yelpcdn.com/bphoto/Qx_J6sv6BFxPvP0i3r7hjw/o.jpg',
-      'Buffalo Chicken Wrap': 'https://s3-media0.fl.yelpcdn.com/bphoto/vb7GqNz6e4J1qYxfzrLi_A/o.jpg',
+      'Brisket Mac & Cheese': 'menu-special-brisket.jpg',
+      'Classic Burger': 'item-classic-burger.jpg',
+      'Original Poutine': 'item-poutine.jpg',
+      'Chicken Sandwich': 'item-chicken-sandwich.jpg',
+      'Parmesan Chicken': 'item-parmesan-chicken.jpg',
+      'Loaded Fries': 'item-loaded-fries.jpg',
+      'Shrimp Po-Boy': 'item-shrimp-poboy.jpg',
+      'Mac & Cheese': 'item-mac-cheese.jpg',
+      'Buffalo Chicken Wrap': 'item-buffalo-wrap.jpg',
     };
-    return images[name] || 'https://s3-media0.fl.yelpcdn.com/bphoto/RoDrT6UTCt1QeWMkcfH5bw/o.jpg';
+    return basePath + (images[name] || 'menu-spread.jpg');
   };
 
   const isSpecial = item.category === 'specials';
