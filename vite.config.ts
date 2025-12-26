@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     const apiKey = process.env.VITE_GEMINI_API_KEY || env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || '';
 
     return {
-      base: '/HBrothers-Website/',
+      base: '/hbrothers-website/',
       server: {
         port: 3000,
         host: '0.0.0.0',

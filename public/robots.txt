@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://joblas.github.io/HBrothers-Website/sitemap.xml
+Sitemap: https://joblas.github.io/hbrothers-website/sitemap.xml

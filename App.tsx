@@ -12,7 +12,7 @@ import HBrothersConcierge from './components/HBrothersConcierge';
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter basename="/HBrothers-Website">
+    <BrowserRouter basename="/hbrothers-website">
       <div className="flex flex-col min-h-screen selection:bg-karak-accent selection:text-karak-primary">
         <Header />
         <main className="flex-grow">

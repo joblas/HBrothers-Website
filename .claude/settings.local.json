@@ -17,7 +17,14 @@
       "WebFetch(domain:www.times-advocate.com)",
       "Bash(cat:*)",
       "Bash(gh run:*)",
-      "WebFetch(domain:joblas.github.io)"
+      "WebFetch(domain:joblas.github.io)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx vite-node:*)",
+      "Bash(del \"C:\\Users\\blasj\\Projects\\hbrothers-website\\test-holidays.ts\")"
     ],
     "deny": [],
     "ask": []
